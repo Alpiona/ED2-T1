@@ -9,39 +9,42 @@ void OrdeneExternoA() {
     int NBlocos = 0; //IMAGINO QUE SEJA O QUE VAI IDENTIFICAR OS BLOCOS;;
     int ordem[m];
     ArqEntradaTipo ArqEntrada, ArqSaida;
-    ArqEntradaTipo arrArqEnt[OrdemIntercalacao];
+    ArqEntradaTipo ArrArqEnt[OrdemIntercalacao];
     TipoRegistroA memoria[m];
-    ArqSaida = fopen("teste", "w");
+    ArqSaida = fopen("arquivosaida.bin", "w");
     short Fim;
     int Low, High, Lim;
     NBlocos = 0;
     ArqEntrada = fopen("arquivoentrada.txt", "r");
     do /*Formacao inicial dos NBlocos ordenados */ {
-        NBlocos++;
         Fim = EnchePaginas(m, NBlocos, ArqEntrada, memoria); //PEGA A QUANTIDADE DE REGISTROS NÃO USADOS
         m -= Fim; //LIMITE DE REGISTROS MENOS A QUANTIDADE NÃO USADA, PARA NÃO VERIFICAR REGISTROS QUE NÃO ESTÃO SENDO USADOS
         OrdeneInterno(m, ordem, memoria); //ORDENA OS REGISTROS
         ArqSaida = AbreArqSaida(NBlocos);
         DescarregaPaginas(m, ordem, ArqSaida, memoria);
+        NBlocos++;
         fclose(ArqSaida);
     } while (!Fim);
     fclose(ArqEntrada);
     Low = 0;
     High = NBlocos - 1;
-//    while (Low < High) /* Intercalacao dos NBlocos ordenados */ {
-//        Lim = Minimo(Low + OrdemIntercalacao - 1, High);
-//        AbreArqEntrada(ArrArqEnt, Low, Lim);
-//        High++;
-//        ArqSaida = AbreArqSaida(High);
-//        Intercale(ArrArqEnt, Low, Lim, ArqSaida);
-//        fclose(ArqSaida);
-//        for (i = Low; i < Lim; i++) {
-//            fclose(ArrArqEnt[i]);
-//            Apague_Arquivo(ArrArqEnt[i]);
-//        }
-//        Low += OrdemIntercalacao;
-//    }
-//    Mudar o nome do arquivo High para o nome fornecido pelo usuario;
+    while (Low < High) /* Intercalacao dos NBlocos ordenados */ {
+        Lim = Minimo(Low + OrdemIntercalacao - 1, High);
+        AbreArqEntrada(ArrArqEnt, Low, Lim);
+        High++;
+        ArqSaida = AbreArqSaida(High);
+        Intercale(ArrArqEnt, Low, Lim, ArqSaida);
+        fclose(ArqSaida);
+        for (int i = Low; i <= Lim; i++) {
+            fclose(ArrArqEnt[Lim - i]);
+            printf("%d\n",i);
+            Apague_Arquivo(i);
+        }
+        Low += OrdemIntercalacao;
+    }
+    char velhoNome[30], novoNome[30];
+    sprintf(velhoNome, "%d", High);
+    int renomear = rename(velhoNome, "teste");
 }
 
 short EnchePaginas(int m, int NBlocos, ArqEntradaTipo ArqEntrada, TipoRegistroA* registro) {
@@ -72,7 +75,7 @@ void OrdeneInterno(int m, int ordem[], TipoRegistroA* memoria) {
     }
 
     for (int i = 0; i < m; i++) { //PASSA TODAS A POSIÇÕES DO VETOR DE ORDEM
-        auxChar = 'z';
+        auxChar = 'Z';
         for (int j = 0; j < m; j++) { //PASSA POR TODAS OS REGISTROS NA MÉMORIA
             usado = 0;
             if (strcmp(&auxChar, &memoria[j].chave) >= 0) { //AS CHAVES COM VALOR MAIS BAIXO ENTRAM NESSE 'IF'
@@ -104,7 +107,57 @@ void DescarregaPaginas(int m, int ordem[], ArqEntradaTipo ArqSaida, TipoRegistro
     int aux;
     for (int i = 0; i < m; i++) {
         aux = ordem[i];
-        fwrite(&memoria[aux].chave, sizeof (char), sizeof (memoria[aux].chave), ArqSaida);
-        fwrite(&memoria[aux].peso, sizeof (char), sizeof (memoria[aux].peso), ArqSaida);
+        fprintf(ArqSaida, "%c%s\n", memoria[aux].chave, memoria[aux].peso);
+        //        fwrite(&memoria[aux].chave, sizeof (char), sizeof (memoria[aux].chave), ArqSaida);
+        //        fwrite(&memoria[aux].peso, sizeof (char), sizeof (memoria[aux].peso), ArqSaida);
     }
+}
+
+int Minimo(int Lim, int High) {
+    if (High <= Lim) {
+        return High;
+    } else {
+        return Lim;
+    }
+}
+
+void AbreArqEntrada(ArqEntradaTipo* ArrArqEnt, int Low, int Lim) {
+    char aux[30];
+    for (int i = 0; i <= (Lim - Low); i++) {
+        sprintf(aux, "%d", (Low + i));
+        ArrArqEnt[i] = fopen(aux, "r");
+    }
+}
+
+void Intercale(ArqEntradaTipo* ArrArqEnt, int Low, int Lim, ArqEntradaTipo ArqSaida) {
+    char chaves[Lim - Low + 1];
+    char auxChar;
+    int auxInt, fim = 0;
+    char auxString[40];
+    for (int i = 0; i <= (Lim - Low); i++) {
+        chaves[i] = fgetc(ArrArqEnt[i]);
+    }
+    while (fim != 1) {
+        auxChar = 'Z';
+        auxInt = 999;
+        for (int i = 0; i <= (Lim - Low); i++) {
+            if ((strcmp(&auxChar, &chaves[i]) > 0)&&(chaves[i] != EOF)) {
+                auxChar = chaves[i];
+                auxInt = i;
+            }
+        }
+        if (auxInt != 999) {
+            fgets(auxString, 40, ArrArqEnt[auxInt]);
+            fprintf(ArqSaida, "%c%s", chaves[auxInt], auxString);
+            chaves[auxInt] = fgetc(ArrArqEnt[auxInt]);
+        } else {
+            fim = 1;
+        }
+    }
+}
+
+void Apague_Arquivo(int numeroArq) {
+    char aux[30];
+    sprintf(aux, "%d", numeroArq);
+    remove(aux);
 }
