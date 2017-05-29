@@ -1,35 +1,30 @@
-#include   <limits.h>
-#include   <stdio.h>
-#include   <stdlib.h>
-#include   <sys/time.h>
+// #include   <limits.h>
+// #include   <stdio.h>
+// #include   <stdlib.h>
+// #include   <string.h>
+// #include   <sys/time.h>
+
+//#define MAXTAM 100
+
+#include "criaArqAleatorio.h"
 
 // Gerador de números aleatórios
 
 // Tipos 
 
-typedef long TipoChave;
-typedef struct TipoItem {
-  TipoChave Chave;
-  // ----- TipoChave outroasChaves[9]; // item C exercicio 1
-  /* outros componentes */
-} TipoItem;
+// typedef long int TipoChave;
+// typedef char TipoPeso[32];
+// typedef struct TipoItem {
+//   TipoChave Chave;
+//   TipoPeso Peso;
 
-// variaveis para comparacoes e movimentacoes globais
-long int comp, mov;
-double tMiliSec;
+// } TipoItem;
 
-// funcoes auxiliares das variaveis globais
-void printVariables(double miliSec) {
-	printf("\nComparacoes = %li\n", comp/3);
-	printf("Movimentacoes = %li\n", mov/3);
-	printf("Tempo(miliSec) = %f\n\n", miliSec / 3.0);
-}
-
-typedef int TipoIndice;
-typedef TipoItem TipoVetor[MAXTAM + 1]; 
+// typedef int TipoIndice;
+// TipoIndice i, n;
+// typedef TipoItem TipoVetor[MAXTAM + 1]; 
 /* MAXTAM+1 por causa da sentinela em Insercao */
-TipoVetor A;
-TipoIndice i, n;
+//TipoVetor A;
 
 //  --------------------------------------------
 //	Criadores de arquivos com números aleatórios
@@ -59,18 +54,77 @@ void Permut( TipoItem *A, int n)
   }
 }
 
-int criaVetor(TipoIndice n) {
-	TipoVetor A;
-	for (int i = 0; i <= n; i++) {
-		A[i].Chave = i;
-	}
+// void criaVetor(TipoIndice n) {
+// 	//if (n == MAXTAM_25) { }
+// 	TipoItem Aux[n+1];
+// 	TipoItem B[n+1];
+// 	for (int i = 0; i <= n; i++) {
+// 		A[i].Chave = i;
+// 		strcpy(A[i].Peso,"1234567890123456789012345678901");
+// 	}
+// 	Permut(Aux,n);
+// 	Copia(Aux,B,n);
+// }
 
-	Permut(A, n);
-	return A;
+// TipoVetor criaVetor(TipoIndice n) {
+// 	TipoVetor B, C;
+// 	for (int i = 0; i <= n; i++) {
+// 		B[i].Chave = i;
+// 		strcpy(B[i].Peso,"1234567890123456789012345678901");
+// 	}
+
+// 	Permut(B, n);
+// 	Copia(B,C,n);
+// 	return B;
+// }
+
+void imprimeVetor(TipoItem *V, TipoIndice n) {
+	for (i = 1; i <= n; i++)
+    printf("%li ", V[i].Chave);  printf("\n");
 }
 
-void criaArquivoVetor(TipoItem *A) {
-	// pegando o vetor, criar o arquivo
-	
+// void criaArquivoVetor(TipoItem *A, TipoIndice n, char nomeArquivo[]) {
+// 	FILE *fp = NULL;
+// 	fp = fopen(nomeArquivo, "a");
+// 	if (fp != NULL) {
+// 		printf("\n FILE NOT NULL\n");
+// 		for(i=1;i<=n;i++) {
+// 			fprintf(fp,"%li ", A[i].Chave);
+// 		}
+// 		//fwrite(A, sizeof(long), sizeof(A), fp);
+// 		fclose(fp);
+// 	}
+// }
+
+void criaArquivoAleatorio(TipoIndice n, char nomeArquivo[]) {
+	//criaVetor(n);
+	TipoItem Aux[n+1];
+	TipoItem B[n+1];
+	for (int i = 0; i <= n; i++) {
+		Aux[i].Chave = i;
+		strcpy(Aux[i].Peso,"1234567890123456789012345678901");
+	}
+	Permut(Aux,n);
+	Copia(Aux,B,n);
+
+	// criando FILE
+	FILE *fp = NULL;
+	fp = fopen(nomeArquivo, "a");
+	if (fp != NULL) {
+		printf("\n FILE NOT NULL\n");
+		for(i=1;i<=n;i++) {
+			fprintf(fp,"%li ", Aux[i].Chave);
+		}
+		//fwrite(A, sizeof(long), sizeof(A), fp);
+		fclose(fp);
+	}
+	//criaArquivoVetor(A,n,nomeArquivo);
+}
+
+int main() {
+	n = 100;
+	criaArquivoAleatorio(n,"primeiro_arquivo.txt");
+
+	return 0;
 }
 
