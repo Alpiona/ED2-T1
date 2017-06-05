@@ -8,7 +8,7 @@
 #include   <sys/time.h>
 
 typedef long int TipoChave;
-typedef char TipoPeso[32];
+typedef char TipoPeso[24];
 typedef struct TipoItem {
   TipoChave Chave;
   TipoPeso Peso;

@@ -100,9 +100,9 @@ void criaArquivoAleatorio(TipoIndice n, char nomeArquivo[]) {
 	//criaVetor(n);
 	TipoItem Aux[n+1];
 	TipoItem B[n+1];
-	for (int i = 0; i <= n; i++) {
+	for (int i = 1; i <= n; i++) {
 		Aux[i].Chave = i;
-		strcpy(Aux[i].Peso,"1234567890123456789012345678901");
+		strcpy(Aux[i].Peso,"123456789012345678901234");
 	}
 	Permut(Aux,n);
 	Copia(Aux,B,n);
@@ -119,12 +119,5 @@ void criaArquivoAleatorio(TipoIndice n, char nomeArquivo[]) {
 		fclose(fp);
 	}
 	//criaArquivoVetor(A,n,nomeArquivo);
-}
-
-int main() {
-	n = 100;
-	criaArquivoAleatorio(n,"primeiro_arquivo.txt");
-
-	return 0;
 }
 
