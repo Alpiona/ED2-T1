@@ -28,19 +28,25 @@ void OrdeneExternoA() {
     fclose(ArqEntrada);
     Low = 0;
     High = NBlocos - 1;
+    printf("Low foi usado como valor do menor arquivo que não foi ordenado ainda."
+            " Lim é até qual arquivo (a partir do Low), será ordernado dessa vez. "
+            "High é o arquivo com a numeração mais alta já criado.\n\n");
+    int counter = 1;
     while (Low < High) /* Intercalacao dos NBlocos ordenados */ {
         Lim = Minimo(Low + OrdemIntercalacao - 1, High);
+        printf("%dª interação: Low = %d | Lim = %d | High = %d\n", counter, Low, Lim, High);
         AbreArqEntrada(ArrArqEnt, Low, Lim);
         High++;
+        printf("Arquivo de saída: '%d': ", High);
         ArqSaida = AbreArqSaida(High);
         Intercale(ArrArqEnt, Low, Lim, ArqSaida);
         fclose(ArqSaida);
         for (int i = Low; i <= Lim; i++) {
             fclose(ArrArqEnt[Lim - i]);
-            printf("%d\n",i);
             Apague_Arquivo(i);
         }
         Low += OrdemIntercalacao;
+        counter++;
     }
     char velhoNome[30], novoNome[30];
     sprintf(velhoNome, "%d", High);
@@ -91,9 +97,7 @@ void OrdeneInterno(int m, int ordem[], TipoRegistroA* memoria) {
             }
         }
         ordem[i] = auxInt; //A CHAVE MAIS BAIXA ENTRA PARA O VETOR DE ORDEM
-        printf("%c---%c\n", memoria[i].chave, memoria[auxInt].chave);
     } //NO FINAL O VETOR DE ORDEM FICA, POR EXEMPLO, "4132", SIGNIFICA QUE 4ºREGISTRO PRIMEIRO, 1ºREGISTRO EM SEGUNDO,ETC...
-    printf("--------PŔOXIMO BLOCO ---------\n");
 }
 
 ArqEntradaTipo AbreArqSaida(int NBlocos) {
@@ -107,9 +111,8 @@ void DescarregaPaginas(int m, int ordem[], ArqEntradaTipo ArqSaida, TipoRegistro
     int aux;
     for (int i = 0; i < m; i++) {
         aux = ordem[i];
-        fprintf(ArqSaida, "%c%s\n", memoria[aux].chave, memoria[aux].peso);
-        //        fwrite(&memoria[aux].chave, sizeof (char), sizeof (memoria[aux].chave), ArqSaida);
-        //        fwrite(&memoria[aux].peso, sizeof (char), sizeof (memoria[aux].peso), ArqSaida);
+        fwrite(&memoria[aux].chave, sizeof (char), 1, ArqSaida);
+        fwrite(&memoria[aux].peso, sizeof (char), 31, ArqSaida);
     }
 }
 
@@ -122,16 +125,29 @@ int Minimo(int Lim, int High) {
 }
 
 void AbreArqEntrada(ArqEntradaTipo* ArrArqEnt, int Low, int Lim) {
-    char aux[30];
+    char aux[30], auxChar;
     for (int i = 0; i <= (Lim - Low); i++) {
         sprintf(aux, "%d", (Low + i));
+        printf("Arquivo de entrada '%s': ", aux);
         ArrArqEnt[i] = fopen(aux, "r");
+        while (1) {
+            auxChar = fgetc(ArrArqEnt[i]);
+            if (auxChar == EOF) {
+                break;
+            }
+            else{
+                printf("%c", auxChar);
+                fread(&aux, sizeof(char),31,ArrArqEnt[i]);
+            }
+        }
+        printf("\n");
+        rewind(ArrArqEnt[i]);
     }
 }
 
 void Intercale(ArqEntradaTipo* ArrArqEnt, int Low, int Lim, ArqEntradaTipo ArqSaida) {
     char chaves[Lim - Low + 1];
-    char auxChar;
+    char auxChar, auxChar2;
     int auxInt, fim = 0;
     char auxString[40];
     for (int i = 0; i <= (Lim - Low); i++) {
@@ -147,13 +163,18 @@ void Intercale(ArqEntradaTipo* ArrArqEnt, int Low, int Lim, ArqEntradaTipo ArqSa
             }
         }
         if (auxInt != 999) {
-            fgets(auxString, 40, ArrArqEnt[auxInt]);
-            fprintf(ArqSaida, "%c%s", chaves[auxInt], auxString);
+            printf("%c", chaves[auxInt]);
+            fwrite(&chaves[auxInt], sizeof (char), 1, ArqSaida);
+            for (int i = 0; i < 31; i++) {
+                auxChar2 = fgetc(ArrArqEnt[auxInt]);
+                fwrite(&auxChar2, sizeof (char), 1, ArqSaida);
+            }
             chaves[auxInt] = fgetc(ArrArqEnt[auxInt]);
         } else {
             fim = 1;
         }
     }
+    printf("\n\n");
 }
 
 void Apague_Arquivo(int numeroArq) {
