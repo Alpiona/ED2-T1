@@ -43,7 +43,7 @@ double rand0a1()
 }
 
 void Permut( TipoItem *A, int n) 
-{ int i,j;
+{ int j;
   TipoItem b;
 
   for(i = n-1; i>0; i --) 
@@ -96,24 +96,36 @@ void imprimeVetor(TipoItem *V, TipoIndice n) {
 // 	}
 // }
 
-void criaArquivoAleatorio(TipoIndice n, char nomeArquivo[]) {
+void criaArquivoAleatorio(TipoIndice n, char *nomeArquivo) {
 	//criaVetor(n);
 	TipoItem Aux[n+1];
 	TipoItem B[n+1];
-	for (int i = 1; i <= n; i++) {
+	int auxCount = 0;
+	for (i = 1; i <= n; i++) {
+		printf("CRIAARQALEATORIO 1\n");
 		Aux[i].Chave = i;
-		strcpy(Aux[i].Peso,"123456789012345678901234");
+		printf("%d", sizeof(i));
+		strcpy(Aux[i].Peso,"12345678901234567890123");
+		puts(Aux[i].Peso); printf("CRIAARQALEATORIO 2\n"); auxCount++;
+		//printf("%s", Aux[i].Peso);
 	}
+	printf("%d", auxCount);
 	Permut(Aux,n);
+
 	Copia(Aux,B,n);
 
+	
 	// criando FILE
 	FILE *fp = NULL;
 	fp = fopen(nomeArquivo, "a");
 	if (fp != NULL) {
 		printf("\n FILE NOT NULL\n");
 		for(i=1;i<=n;i++) {
-			fprintf(fp,"%li ", Aux[i].Chave);
+			if (i == n) {
+				fprintf(fp,"%li", Aux[i].Chave);
+			} else {
+				fprintf(fp,"%li ", Aux[i].Chave);
+			}
 		}
 		//fwrite(A, sizeof(long), sizeof(A), fp);
 		fclose(fp);

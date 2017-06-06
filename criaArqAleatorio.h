@@ -15,7 +15,7 @@ typedef struct TipoItem {
 
 } TipoItem;
 
-typedef int TipoIndice;
+typedef long int TipoIndice;
 TipoIndice i, n;
 
 //  --------------------------------------------
@@ -31,6 +31,6 @@ void imprimeVetor(TipoItem *V, TipoIndice n);
 //	Função que cria arquivo de qualquer tamanho n de números aleatórios
 //  -------------------------------------------------------------------
 
-void criaArquivoAleatorio(TipoIndice n, char nomeArquivo[]);
+void criaArquivoAleatorio(TipoIndice n, char *nomeArquivo);
 
 #endif
